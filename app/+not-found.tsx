@@ -7,15 +7,7 @@ export default function NotFoundScreen() {
     <SafeAreaView style={styles.container}>
       <Text >Ooops! Bu Sayfa Henüz Hazır Değil</Text>
       <View style={styles.content}>
-        <Video
-          source={require("../assets/not-found/enes3.mp4")}
-          style={styles.video}
-          isLooping
-          shouldPlay
-          isMuted
-          useNativeControls={false}
-          resizeMode={ResizeMode.CONTAIN}
-        />
+        
         <Link href="/" style={styles.link}>
           <Text style={styles.linkText}>Ana Sayfaya Dön</Text>
         </Link>

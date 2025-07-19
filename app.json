@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Spor",
-    "slug": "Spor",
+    "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -47,6 +47,7 @@
       "eas": {
         "projectId": "5c6e433e-b29d-4062-80b8-d6aa10e7f1e1"
       }
-    }
+    },
+    "owner": "kararsizpulsar"
   }
 }
