@@ -1,9 +1,13 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useContext } from "react";
+import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { ThemeContext } from "../ThemContext.js";
+// let ISDARKMODE: any;
 export default function HomeScreen() {
   const router = useRouter();
-
+  const { isDarkMode, setDarkMode } = useContext(ThemeContext);
+  const styles = getStyles(isDarkMode);
   return (
     // <View
     //   style={{
@@ -80,57 +84,79 @@ export default function HomeScreen() {
           </Pressable>
         </View>
       </View>
+      <View style={styles.switchContainer}>
+        {/* <Text style={[styles.font, { color: isDarkMode ? "#eee" : "#000" }]}>
+          {isDarkMode ? "Gece Modu" : "Gündüz Modu"}
+        </Text> */}
+        <Switch
+          value={isDarkMode}
+          onValueChange={(value) => setDarkMode(!isDarkMode)}
+          trackColor={{ false: "#767577", true: "#33cccc" }}
+          thumbColor={isDarkMode ? "#7e7a81ff" : "#33cccc"}
+        />
+      </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    // backgroundColor: "blue",
-    flex: 1,
-    // width: "100%",
-    // height: "100%",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  shadowWrapper: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-    borderRadius: 10,
-    backgroundColor: "white", // Android’de elevation için gerekli
-    marginBottom: 10,
-  },
-  container: {
-    flexDirection: "row",
-    width: "95%",
-    justifyContent: "space-between",
-    // backgroundColor:"black",
-  },
-  box: {
-    // margin: 10,
-    width: "100%",
-    // height: "100%",
-    aspectRatio: 1,
-    backgroundColor: "white",
-    borderStyle: "solid",
-    // borderWidth: 1,
+const getStyles = (isDarkMode: any) =>
+  StyleSheet.create({
+    switchContainer: {
+      position: "absolute",
+      bottom: 50,
+      // right: "50%",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+    },
+    content: {
+      position: "relative",
+      // backgroundColor: "blue",
+      flex: 1,
+      // width: "100%",
+      // height: "100%",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    shadowWrapper: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+      borderRadius: 10,
+      backgroundColor: "white", // Android’de elevation için gerekli
+      marginBottom: 10,
+    },
+    container: {
+      flexDirection: "row",
+      width: "95%",
+      justifyContent: "space-between",
+      // backgroundColor:"black",
+    },
+    box: {
+      // margin: 10,
+      width: "100%",
+      // height: "100%",
+      aspectRatio: 1,
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      borderStyle: "solid",
+      // borderWidth: 1,
 
-    borderColor: "rgb(255, 198, 41)",
-    borderRadius: 10,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+      borderColor: "rgb(255, 198, 41)",
+      borderRadius: 10,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
 
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-  },
-  gif: { width: "60%", aspectRatio: 1 },
-  font: { fontFamily: "orbitron", fontSize: 18 },
-  pressable: { width: "49%", aspectRatio: 1 },
-});
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+    },
+    gif: { width: "60%", aspectRatio: 1 },
+    font: { fontFamily: "orbitron", fontSize: 18 },
+    pressable: { width: "49%", aspectRatio: 1 },
+  });

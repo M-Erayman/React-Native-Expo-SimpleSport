@@ -1,5 +1,7 @@
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import uuid from "react-native-uuid";
+
 import {
   Alert,
   Animated,
@@ -15,8 +17,10 @@ import {
 import { Swipeable } from "react-native-gesture-handler";
 import { loadHareketler, saveHareketler } from "../data/hareketStorage";
 import { loadPrograms, savePrograms } from "../data/programStorage";
-
+import { ThemeContext } from "../ThemContext.js";
 export default function AddProgramDetail() {
+  const { isDarkMode } = useContext(ThemeContext);
+  const styles = getStyles(isDarkMode);
   const { newprogram_id, part } = useLocalSearchParams();
 
   const [inputValue, setInputValue] = useState("");
@@ -54,7 +58,7 @@ export default function AddProgramDetail() {
 
         if (!hareket) {
           const newHareket = {
-            id: Date.now().toString(),
+            id: uuid.v4(),
             name: hareketName,
             part: part,
             records: [],
@@ -72,7 +76,6 @@ export default function AddProgramDetail() {
         if (!updatedPrograms[programIndex][partKey].includes(hareket.id)) {
           updatedPrograms[programIndex][partKey].push(hareket.id);
         }
-
       }
 
       await saveHareketler(updatedHareketler);
@@ -215,92 +218,94 @@ export default function AddProgramDetail() {
   );
 }
 
-const styles = StyleSheet.create({
-  inputContainerWrapper: {
-    width: "100%",
-    padding: 10,
-    backgroundColor: "white",
-    borderTopWidth: 1,
-    borderColor: "#ccc",
-  },
-  resultContainer: {
-    backgroundColor: "#f9f9f9",
-    padding: 5,
-    borderRadius: 5,
-    marginBottom: 5,
-  },
-  resultItem: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    fontSize: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  pageContainer: {
-    flex: 1,
-    position: "relative",
-  },
-  scrollContent: {
-    padding: 10,
-  },
-  content: {
-    alignItems: "center",
-    gap: 10,
-  },
-  shadowWrapper: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-    borderRadius: 10,
-    backgroundColor: "white",
-    marginBottom: 10,
-    width: "100%",
-  },
-  container: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderColor: "rgb(255, 198, 41)",
-    borderRadius: 10,
-    width: "96%",
-    height: 50,
-    padding: 10,
-  },
-  programName: {
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 5,
-    width: "96%",
-  },
-  inputContainer: {
-    borderColor: "#ccc",
-    padding: 10,
-    backgroundColor: "white",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-  },
-  okContainer: {
-    backgroundColor: "#33cccc",
-    borderRadius: 50,
-    width: 70,
-    aspectRatio: 1,
-    position: "absolute",
-    bottom: 100,
-    right: 30,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  ok: {
-    color: "white",
-    fontSize: 24,
-  },
-});
+const getStyles = (isDarkMode: any) =>
+  StyleSheet.create({
+    inputContainerWrapper: {
+      width: "100%",
+      padding: 10,
+      backgroundColor: isDarkMode ? "#2e2e2e" : "#eee",
+      borderTopWidth: 1,
+      borderColor: isDarkMode ? "#7e7a81ff" : "white",
+    },
+    resultContainer: {
+      backgroundColor: isDarkMode ? "#68656bff" : "white",
+      padding: 5,
+      borderRadius: 5,
+      marginBottom: 5,
+    },
+    resultItem: {
+      paddingVertical: 4,
+      paddingHorizontal: 8,
+      fontSize: 16,
+      borderBottomWidth: 1,
+      // borderBottomColor: "#eee",
+    },
+    pageContainer: {
+      flex: 1,
+      position: "relative",
+    },
+    scrollContent: {
+      padding: 10,
+    },
+    content: {
+      alignItems: "center",
+      gap: 10,
+    },
+    shadowWrapper: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+      borderRadius: 10,
+      backgroundColor: "white",
+      marginBottom: 10,
+      width: "100%",
+    },
+    container: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      borderColor: "rgb(255, 198, 41)",
+      borderRadius: 10,
+      width: "96%",
+      height: 50,
+      padding: 10,
+    },
+    programName: {
+      textAlign: "center",
+      fontWeight: "bold",
+      fontSize: 16,
+      marginBottom: 5,
+      width: "96%",
+    },
+    inputContainer: {
+      borderColor: isDarkMode ? "#7e7a81ff" : "white",
+      padding: 10,
+      backgroundColor: isDarkMode ? "#2e2e2e" : "#eee",
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: isDarkMode ? "#7e7a81ff" : "white",
+      backgroundColor: isDarkMode ? "#68656bff" : "white",
+      borderRadius: 10,
+      padding: 10,
+      fontSize: 16,
+    },
+    okContainer: {
+      backgroundColor: "#33cccc",
+      borderRadius: 50,
+      width: 70,
+      aspectRatio: 1,
+      position: "absolute",
+      bottom: 100,
+      right: 30,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    ok: {
+      color: "white",
+      fontSize: 24,
+    },
+  });

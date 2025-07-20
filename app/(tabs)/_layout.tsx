@@ -1,14 +1,16 @@
 import type { RouteProp } from "@react-navigation/native";
 import { Stack } from "expo-router";
-import React from "react";
+import React, { useContext } from "react";
 import { Text } from "react-native";
+import { ThemeContext } from "../ThemContext.js";
 
 export default function TabLayout() {
+  const { isDarkMode } = useContext(ThemeContext);
   return (
     <Stack
       screenOptions={{
         headerStyle: {
-          backgroundColor: "whitesmoke",
+          backgroundColor: isDarkMode ? "#2e2e2e" : "whitesmoke",
         },
         headerShadowVisible: false,
         headerTintColor: "rgb(255, 198, 41)",
@@ -18,7 +20,10 @@ export default function TabLayout() {
           fontWeight: "normal", // Variable fontsa weight ile oynayabilirsin
         },
         headerTitleAlign: "center",
-        contentStyle: { backgroundColor: "whitesmoke", paddingBottom: 50 },
+        contentStyle: {
+          backgroundColor: isDarkMode ? "#2e2e2e" : "whitesmoke",
+          paddingBottom: 50,
+        },
       }}
     >
       <Stack.Screen
@@ -122,7 +127,7 @@ export default function TabLayout() {
                 style={{
                   fontFamily: "orbitron",
                   fontSize: 28,
-                  color: "rgb(255, 198, 41)",
+                  color: "#ffc629ff",
                   flexShrink: 0,
                 }}
                 numberOfLines={1}

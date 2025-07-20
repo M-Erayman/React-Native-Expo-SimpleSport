@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Alert,
   Animated,
@@ -17,9 +17,12 @@ import {
 import { Swipeable } from "react-native-gesture-handler";
 import { clearHareketler } from "../data/hareketStorage";
 import { clearPrograms } from "../data/programStorage";
+import { ThemeContext } from "../ThemContext.js";
 const STORAGE_KEY = "program_data";
 
 export default function ProgramlarScreen() {
+  const { isDarkMode } = useContext(ThemeContext);
+  const styles = getStyles(isDarkMode);
   const router = useRouter();
   const [addModalVisible, setaddModalVisible] = useState(false);
   const [weight, setWeight] = useState("");
@@ -38,9 +41,10 @@ export default function ProgramlarScreen() {
     }
   };
 
-  // ! BÜTÜN KAYITLARI SİL
+  // // ! BÜTÜN KAYITLARI SİL
   // useEffect(() => {
   //   clearAllData();
+  //   clearHareketler();
   // }, []);
 
   useEffect(() => {
@@ -282,104 +286,106 @@ export default function ProgramlarScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    // display: "flex",
-    position: "relative",
-    alignItems: "center",
-    gap: 10,
-  },
-  shadowWrapper: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-    borderRadius: 10,
-    backgroundColor: "white", // Android’de elevation için gerekli
-    marginBottom: 10,
-    width: "100%",
-  },
-  ImgContainer: {
-    width: "30%",
-    // aspectRatio: 1,
-    height: "100%",
-    // backgroundColor: "red",
-  },
-  ItemContainer: {
-    width: "70%",
-    height: "100%",
-    justifyContent: "center",
-    // alignItems: "center",
-  },
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "white",
-    borderStyle: "solid",
-    // borderWidth: 1,
-    borderColor: "rgb(255, 198, 41)",
-    borderRadius: 10,
-    width: "96%",
-    height: 100,
-    padding: 10,
-  },
-  programName: {
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
-    overflow: "hidden",
-    marginBottom: 5,
-  },
-  createDate: {
-    fontSize: 14,
-  },
-  createDateText: {},
-  gif: {
-    width: "75%",
-    aspectRatio: 1,
-  },
-  add: {
-    width: 70,
-    aspectRatio: 1,
-    borderRadius: "50%",
-    position: "absolute",
-    bottom: "5%",
-    right: "5%",
-    backgroundColor: "white",
-    borderStyle: "solid",
-    borderWidth: 2,
-    borderColor: "rgb(255, 198, 41)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addPlus: {
-    lineHeight: 50,
-    fontSize: 50,
-    color: "#33cccc",
-    fontWeight: 300,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "#00000099",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modal: {
-    width: 300,
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  input: {
-    borderBottomWidth: 1,
-    marginVertical: 10,
-    padding: 5,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 10,
-  },
-});
+const getStyles = (isDarkMode: any) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      // display: "flex",
+      position: "relative",
+      alignItems: "center",
+      gap: 10,
+    },
+    shadowWrapper: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+      borderRadius: 10,
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white", // Android’de elevation için gerekli
+      marginBottom: 10,
+      width: "100%",
+    },
+    ImgContainer: {
+      width: "30%",
+      // aspectRatio: 1,
+      height: "100%",
+      // backgroundColor: "red",
+    },
+    ItemContainer: {
+      width: "70%",
+      height: "100%",
+      justifyContent: "center",
+      // alignItems: "center",
+    },
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      borderStyle: "solid",
+      // borderWidth: 1,
+      borderColor: "rgb(255, 198, 41)",
+      borderRadius: 10,
+      width: "96%",
+      height: 100,
+      padding: 10,
+    },
+    programName: {
+      textAlign: "center",
+      fontWeight: "bold",
+      fontSize: 16,
+      overflow: "hidden",
+      marginBottom: 5,
+    },
+    createDate: {
+      fontSize: 14,
+    },
+    createDateText: {},
+    gif: {
+      width: "75%",
+      aspectRatio: 1,
+    },
+    add: {
+      width: 70,
+      aspectRatio: 1,
+      borderRadius: "50%",
+      position: "absolute",
+      bottom: "5%",
+      right: "5%",
+      backgroundColor: isDarkMode ? "#33cccc" : "white",
+      borderStyle: "solid",
+      borderWidth: 2,
+      // borderColor: "rgb(255, 198, 41)",
+      borderColor: isDarkMode ? "#33cccc" : "white",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    addPlus: {
+      lineHeight: 50,
+      fontSize: 50,
+      color: isDarkMode ? "white" : "#33cccc",
+      fontWeight: 300,
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: "#00000099",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modal: {
+      width: 300,
+      padding: 20,
+      backgroundColor: "white",
+      borderRadius: 10,
+    },
+    input: {
+      borderBottomWidth: 1,
+      marginVertical: 10,
+      padding: 5,
+    },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginTop: 10,
+    },
+  });

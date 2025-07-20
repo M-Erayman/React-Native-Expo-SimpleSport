@@ -1,10 +1,10 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { loadHareketler } from "../data/hareketStorage";
 import { loadPrograms } from "../data/programStorage";
-
+import { ThemeContext } from "../ThemContext.js";
 type ValidPart =
   | "chest"
   | "triceps"
@@ -16,6 +16,8 @@ type ValidPart =
   | "cardio";
 
 export default function Programitem() {
+  const { isDarkMode } = useContext(ThemeContext);
+  const styles = getStyles(isDarkMode);
   const router = useRouter();
   const { program_id, part } = useLocalSearchParams();
 
@@ -95,6 +97,15 @@ export default function Programitem() {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
+      {/* <Text style={styles.title}>Telefonundaki Tüm Hareketler:</Text>
+      <Text style={styles.jsonText}>
+        {JSON.stringify(hareketData, null, 2)}
+      </Text>
+
+      <Text style={styles.title}>Telefonundaki Tüm Programlar:</Text>
+      <Text style={styles.jsonText}>
+        {JSON.stringify(programData, null, 2)}
+      </Text> */}
       {hareketIdList.map((hareketId: any) => {
         const hareket = hareketData.find((h) => h.id === hareketId.toString());
         if (!hareket) return null;
@@ -180,78 +191,79 @@ export default function Programitem() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: {
-    flex: 1,
-    position: "relative",
-    alignItems: "center",
-    gap: 10,
-    padding: 10,
-  },
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "white",
-    borderColor: "rgb(255, 198, 41)",
-    borderRadius: 10,
-    width: "96%",
-    height: 170,
-    padding: 10,
-  },
-  shadowWrapper: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-    borderRadius: 10,
-    backgroundColor: "white",
-    marginBottom: 10,
-    alignItems: "center",
-  },
-  ImgContainer: {
-    width: "33.3%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  ItemContainer: {
-    width: "100%",
-    height: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  programName: {
-    textAlign: "center",
-    fontWeight: "bold",
-    fontSize: 16,
-    overflow: "hidden",
-    marginBottom: 5,
-  },
-  createDate: {
-    fontSize: 14,
-  },
-  createDateText: {},
-  gif: {
-    width: "50%",
-    aspectRatio: 1,
-  },
-  errorText: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    color: "#33cccc",
-    textAlign: "center",
-  },
-  title: {
-    fontWeight: "bold",
-    fontSize: 16,
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  jsonText: {
-    fontFamily: "monospace",
-    fontSize: 12,
-    color: "#333",
-  },
-});
+const getStyles = (isDarkMode: any) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      position: "relative",
+      alignItems: "center",
+      gap: 10,
+      padding: 10,
+    },
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      borderColor: "rgb(255, 198, 41)",
+      borderRadius: 10,
+      width: "96%",
+      height: 170,
+      padding: 10,
+    },
+    shadowWrapper: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+      borderRadius: 10,
+      backgroundColor: "white",
+      marginBottom: 10,
+      alignItems: "center",
+    },
+    ImgContainer: {
+      width: "33.3%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    ItemContainer: {
+      width: "100%",
+      height: "100%",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    programName: {
+      textAlign: "center",
+      fontWeight: "bold",
+      fontSize: 16,
+      overflow: "hidden",
+      marginBottom: 5,
+    },
+    createDate: {
+      fontSize: 14,
+    },
+    createDateText: {},
+    gif: {
+      width: "50%",
+      aspectRatio: 1,
+    },
+    errorText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      marginBottom: 15,
+      color: "#33cccc",
+      textAlign: "center",
+    },
+    title: {
+      fontWeight: "bold",
+      fontSize: 16,
+      marginTop: 20,
+      marginBottom: 10,
+    },
+    jsonText: {
+      fontFamily: "monospace",
+      fontSize: 12,
+      color: "#333",
+    },
+  });

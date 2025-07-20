@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider } from "../app/ThemContext";
 export default function RootLayout() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
   useEffect(() => {
@@ -28,7 +29,9 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Slot />
+        <ThemeProvider>
+          <Slot />
+        </ThemeProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

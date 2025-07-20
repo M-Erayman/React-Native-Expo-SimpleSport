@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -15,8 +15,10 @@ import {
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { loadHareketler, saveHareketler } from "../data/hareketStorage";
-
+import { ThemeContext } from "../ThemContext.js";
 export default function ItemDetail() {
+  const { isDarkMode } = useContext(ThemeContext);
+  const styles = getStyles(isDarkMode);
   const { hareket_id } = useLocalSearchParams<{ hareket_id: string }>();
   const [records, setRecords] = useState<any[]>([]);
   const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>(
@@ -197,18 +199,20 @@ export default function ItemDetail() {
                           source={require("../../assets/gif/item/weight.gif")}
                           style={styles.gif}
                         />
-                        <Text style={styles.createDate}>
-                          {record.weight} Kg
-                        </Text>
+                      </View>
+                      <View style={styles.txtContainer}>
+                        <Text style={styles.createDate}>{record.weight}</Text>
+                        <Text style={{ fontFamily: "orbitron" }}>Kg</Text>
                       </View>
                       <View style={styles.ImgContainer}>
                         <Image
                           source={require("../../assets/gif/item/loop.gif")}
                           style={styles.gif}
                         />
-                        <Text style={styles.createDate}>
-                          {record.repeat} Tekrar
-                        </Text>
+                      </View>
+                      <View style={styles.txtContainer}>
+                        <Text style={styles.createDate}>{record.repeat}</Text>
+                        <Text style={{ fontFamily: "orbitron" }}> Tekrar</Text>
                       </View>
                     </View>
                   </View>
@@ -253,85 +257,111 @@ export default function ItemDetail() {
   );
 }
 
-const styles = StyleSheet.create({
-  content: { flex: 1, alignItems: "center", paddingLeft: 10, paddingRight: 10 },
-  dateHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#eee",
-    borderRadius: 10,
-    padding: 10,
-    marginVertical: 5,
-    width: "100%",
-  },
-  shadowWrapper: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2,
-    borderRadius: 10,
-    backgroundColor: "white",
-    marginBottom: 10,
-    width: "96%",
-    alignSelf: "center",
-  },
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    height: 100,
-    padding: 0,
-  },
-  ImgContainer: { alignItems: "center", justifyContent: "center" },
-  gif: { width: 70, aspectRatio: 1 },
-  createDate: { fontSize: 14, textAlign: "center" },
-  programName: { fontWeight: "bold", fontSize: 16 },
-  add: {
-    width: 70,
-    aspectRatio: 1,
-    borderRadius: 35,
-    position: "absolute",
-    bottom: "5%",
-    right: "5%",
-    backgroundColor: "white",
-    borderWidth: 2,
-    borderColor: "rgb(255, 198, 41)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  addPlus: { fontSize: 50, color: "#33cccc", lineHeight: 50 },
-  overlay: {
-    flex: 1,
-    backgroundColor: "#00000099",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modal: {
-    width: 300,
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-  },
-  input: { borderBottomWidth: 1, marginVertical: 10, padding: 5 },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    // height: "100%",
-    marginTop: 10,
-  },
+const getStyles = (isDarkMode: any) =>
+  StyleSheet.create({
+    content: {
+      flex: 1,
+      alignItems: "center",
+      paddingLeft: 10,
+      paddingRight: 10,
+    },
+    dateHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      borderRadius: 10,
+      padding: 10,
+      marginVertical: 5,
+      width: "100%",
+    },
+    shadowWrapper: {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 1,
+      elevation: 2,
+      borderRadius: 10,
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      marginBottom: 10,
+      width: "96%",
+      alignSelf: "center",
+    },
+    container: {
+      // display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-around",
+      alignItems: "center",
+      // backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
+      height: 100,
+      width: "100%",
+      padding: 0,
+    },
+    txtContainer: {
+      alignItems: "center",
+    },
+    ImgContainer: { alignItems: "center", justifyContent: "center" },
+    gif: { width: 70, aspectRatio: 1 },
+    createDate: {
+      color: "#33cccc",
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "center",
+      alignItems: "center",
+    },
+    programName: { fontWeight: "bold", fontSize: 16 },
+    add: {
+      width: 70,
+      aspectRatio: 1,
+      borderRadius: 35,
+      position: "absolute",
+      bottom: "5%",
+      right: "5%",
+      backgroundColor: isDarkMode ? "#33cccc" : "white",
+      // backgroundColor: "white",
+      borderWidth: 2,
 
-  deleteBtn: {
-    backgroundColor: "red",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "45%",
-    borderRadius: 10,
-  },
-  editBtn: {
-    backgroundColor: "orange",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "45%",
-    borderRadius: 10,
-  },
-});
+      borderColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    addPlus: {
+      fontSize: 50,
+      color: isDarkMode ? "white" : "#33cccc",
+      // color: "#33cccc",
+      lineHeight: 50,
+    },
+    overlay: {
+      flex: 1,
+      backgroundColor: "#00000099",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modal: {
+      width: 300,
+      padding: 20,
+      backgroundColor: "white",
+      borderRadius: 10,
+    },
+    input: { borderBottomWidth: 1, marginVertical: 10, padding: 5 },
+    buttonContainer: {
+      flexDirection: "row",
+      justifyContent: "space-around",
+      // height: "100%",
+      marginTop: 10,
+    },
+
+    deleteBtn: {
+      backgroundColor: "red",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "45%",
+      borderRadius: 10,
+    },
+    editBtn: {
+      backgroundColor: "orange",
+      justifyContent: "center",
+      alignItems: "center",
+      height: "45%",
+      borderRadius: 10,
+    },
+  });
