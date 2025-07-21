@@ -73,8 +73,16 @@ export default function ItemDetail() {
   const handleEdit = (recordIndex: number) => {
     swipeableRefs.current[recordIndex]?.close();
     const record = records[recordIndex];
-    setWeight(record.weight.toString());
-    setRepeat(record.repeat.toString());
+    setWeight(
+      Array.isArray(record.weight)
+        ? record.weight.join(" - ")
+        : record.weight.toString()
+    );
+    setRepeat(
+      Array.isArray(record.repeat)
+        ? record.repeat.join(" - ")
+        : record.repeat.toString()
+    );
     setEditRecordIndex(recordIndex);
     setEditModalVisible(true);
   };
@@ -92,18 +100,28 @@ export default function ItemDetail() {
       .toString()
       .padStart(2, "0")}.${today.getFullYear()}`;
 
+    const parseInput = (input: string, isWeight: boolean) => {
+      return input
+        .split("-")
+        .map((x) => (isWeight ? parseFloat(x) : parseInt(x)))
+        .filter((n) => !isNaN(n));
+    };
+
+    const weightArray = parseInput(weight, true);
+    const repeatArray = parseInput(repeat, false);
+
     const updated = [...records];
     if (editRecordIndex !== null) {
       updated[editRecordIndex] = {
         date: dateString,
-        weight: parseInt(weight),
-        repeat: parseInt(repeat),
+        weight: weightArray,
+        repeat: repeatArray,
       };
     } else {
       updated.push({
         date: dateString,
-        weight: parseInt(weight),
-        repeat: parseInt(repeat),
+        weight: weightArray,
+        repeat: repeatArray,
       });
     }
 
@@ -201,17 +219,35 @@ export default function ItemDetail() {
                         />
                       </View>
                       <View style={styles.txtContainer}>
-                        <Text style={styles.createDate}>{record.weight}</Text>
+                        <Text
+                          style={styles.createDate}
+                          numberOfLines={2}
+                          adjustsFontSizeToFit
+                        >
+                          {Array.isArray(record.weight)
+                            ? record.weight.join("-")
+                            : record.weight}
+                        </Text>
                         <Text style={{ fontFamily: "orbitron" }}>Kg</Text>
                       </View>
+
                       <View style={styles.ImgContainer}>
                         <Image
                           source={require("../../assets/gif/item/loop.gif")}
                           style={styles.gif}
                         />
                       </View>
+
                       <View style={styles.txtContainer}>
-                        <Text style={styles.createDate}>{record.repeat}</Text>
+                        <Text
+                          style={styles.createDate}
+                          numberOfLines={2}
+                          adjustsFontSizeToFit
+                        >
+                          {Array.isArray(record.repeat)
+                            ? record.repeat.join("-")
+                            : record.repeat}
+                        </Text>
                         <Text style={{ fontFamily: "orbitron" }}> Tekrar</Text>
                       </View>
                     </View>
@@ -232,16 +268,18 @@ export default function ItemDetail() {
             <Text>Ağırlık (Kg):</Text>
             <TextInput
               style={styles.input}
-              keyboardType="numeric"
+              keyboardType="phone-pad"
               value={weight}
-              onChangeText={(text) => setWeight(text.replace(/[^0-9]/g, ""))}
+              onChangeText={(text) =>
+                setWeight(text.replace(/[^0-9\.\-]/g, ""))
+              }
             />
             <Text>Tekrar (Adet):</Text>
             <TextInput
               style={styles.input}
-              keyboardType="numeric"
+              keyboardType="phone-pad"
               value={repeat}
-              onChangeText={(text) => setRepeat(text.replace(/[^0-9]/g, ""))}
+              onChangeText={(text) => setRepeat(text.replace(/[^0-9\-]/g, ""))}
             />
             <View style={styles.buttonContainer}>
               <Button
@@ -297,11 +335,13 @@ const getStyles = (isDarkMode: any) =>
       padding: 0,
     },
     txtContainer: {
+      width: "30%",
       alignItems: "center",
     },
     ImgContainer: { alignItems: "center", justifyContent: "center" },
     gif: { width: 70, aspectRatio: 1 },
     createDate: {
+      // backgroundColor: "red",
       color: "#33cccc",
       fontSize: 24,
       fontWeight: "bold",

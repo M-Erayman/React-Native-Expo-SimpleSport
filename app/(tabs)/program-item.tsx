@@ -131,10 +131,10 @@ export default function Programitem() {
                       />
                       <Text style={styles.createDate}>
                         {hareket.records && hareket.records.length > 0
-                          ? hareket.records.reduce(
-                              (max: any, r: any) =>
-                                r.weight > max ? r.weight : max,
-                              0
+                          ? Math.max(
+                              ...hareket.records.flatMap((r: any) =>
+                                Array.isArray(r.weight) ? r.weight : [r.weight]
+                              )
                             )
                           : 0}
                       </Text>
@@ -148,10 +148,15 @@ export default function Programitem() {
                       />
                       <Text style={styles.createDate}>
                         {hareket.records
-                          ? hareket.records.reduce(
-                              (sum: any, r: any) => sum + r.repeat,
-                              0
-                            )
+                          ? hareket.records.reduce((sum: any, r: any) => {
+                              const repeats = Array.isArray(r.repeat)
+                                ? r.repeat
+                                : [r.repeat];
+                              return (
+                                sum +
+                                repeats.reduce((a: any, b: any) => a + b, 0)
+                              );
+                            }, 0)
                           : 0}
                       </Text>
                       <Text style={styles.createDateText}> Toplam Tekrar</Text>
@@ -163,10 +168,15 @@ export default function Programitem() {
                       />
                       <Text style={styles.createDate}>
                         {hareket.records
-                          ? hareket.records.reduce(
-                              (sum: any, r: any) => sum + r.repeat,
-                              0
-                            )
+                          ? hareket.records.reduce((sum: any, r: any) => {
+                              const repeats = Array.isArray(r.repeat)
+                                ? r.repeat
+                                : [r.repeat];
+                              return (
+                                sum +
+                                repeats.reduce((a: any, b: any) => a + b, 0)
+                              );
+                            }, 0)
                           : 0}
                       </Text>
                       <Text style={styles.createDateText}> Toplam Tekrar</Text>
