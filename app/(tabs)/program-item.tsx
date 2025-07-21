@@ -97,15 +97,6 @@ export default function Programitem() {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
-      {/* <Text style={styles.title}>Telefonundaki Tüm Hareketler:</Text>
-      <Text style={styles.jsonText}>
-        {JSON.stringify(hareketData, null, 2)}
-      </Text>
-
-      <Text style={styles.title}>Telefonundaki Tüm Programlar:</Text>
-      <Text style={styles.jsonText}>
-        {JSON.stringify(programData, null, 2)}
-      </Text> */}
       {hareketIdList.map((hareketId: any) => {
         const hareket = hareketData.find((h) => h.id === hareketId.toString());
         if (!hareket) return null;
@@ -194,7 +185,7 @@ export default function Programitem() {
 const getStyles = (isDarkMode: any) =>
   StyleSheet.create({
     content: {
-      flex: 1,
+      width: "100%",
       position: "relative",
       alignItems: "center",
       gap: 10,
