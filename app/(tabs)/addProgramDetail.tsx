@@ -29,12 +29,31 @@ export default function AddProgramDetail() {
   const [selectedList, setSelectedList] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchHareketler = async () => {
-      const data = await loadHareketler();
-      setHareketler(data);
+    const fetchData = async () => {
+      const allPrograms = await loadPrograms();
+      const allHareketler = await loadHareketler();
+
+      setHareketler(allHareketler);
+
+      const program = allPrograms.find((p) => p.id === newprogram_id);
+      if (!program) return;
+
+      const partKey = (part as string).toLowerCase();
+
+      const hareketIdList: string[] = program[partKey] || [];
+
+      const hareketNameList = hareketIdList
+        .map((id) => {
+          const hareket = allHareketler.find((h) => h.id === id);
+          return hareket ? hareket.name : null;
+        })
+        .filter((name) => name !== null) as string[];
+
+      setSelectedList(hareketNameList);
     };
-    fetchHareketler();
-  }, []);
+
+    fetchData();
+  }, [newprogram_id, part]);
 
   const handleSaveToProgram = async () => {
     try {
@@ -113,20 +132,51 @@ export default function AddProgramDetail() {
     setFilteredData([]);
   };
 
-  const handleDelete = () => {
+  const handleDelete = (name: string) => {
     Alert.alert(
       "Silmek istediğinize emin misiniz?",
-      "Bu işlem geri alınamaz.",
+      `${name} isimli hareket programdan kaldırılacak.`,
       [
         { text: "Vazgeç", style: "cancel" },
-        { text: "Sil", onPress: () => console.log("Silindi!") },
+        { text: "Sil", onPress: () => handleDeleteItem(name) },
       ]
     );
   };
 
+  const handleDeleteItem = async (name: string) => {
+    try {
+      const updatedList = selectedList.filter((item) => item !== name);
+      setSelectedList(updatedList);
+
+      const allPrograms = await loadPrograms();
+      const allHareketler = await loadHareketler();
+
+      const programIndex = allPrograms.findIndex((p) => p.id === newprogram_id);
+      if (programIndex === -1) return;
+
+      const hareket = allHareketler.find((h) => h.name === name);
+      if (!hareket) return;
+
+      const partKey = (part as string).toLowerCase();
+
+      const updatedProgram = { ...allPrograms[programIndex] };
+      updatedProgram[partKey] = updatedProgram[partKey]?.filter(
+        (id: string) => id !== hareket.id
+      );
+
+      const updatedPrograms = [...allPrograms];
+      updatedPrograms[programIndex] = updatedProgram;
+
+      await savePrograms(updatedPrograms);
+    } catch (e) {
+      console.error("Silme Hatası", e);
+    }
+  };
+
   const renderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
-    dragX: Animated.AnimatedInterpolation<number>
+    dragX: Animated.AnimatedInterpolation<number>,
+    name: string
   ) => {
     const translateX = dragX.interpolate({
       inputRange: [-100, 0],
@@ -135,10 +185,10 @@ export default function AddProgramDetail() {
     });
 
     return (
-      <View style={{ width: 100, height: "100%" }}>
+      <View style={{ width: 100, height: "100%", marginLeft: 10 }}>
         <Animated.View style={{ flex: 1, transform: [{ translateX }] }}>
           <Pressable
-            onPress={handleDelete}
+            onPress={() => handleDelete(name)}
             style={{
               backgroundColor: "red",
               justifyContent: "center",
@@ -166,7 +216,9 @@ export default function AddProgramDetail() {
           {selectedList.map((item, index) => (
             <Swipeable
               key={index}
-              renderRightActions={renderRightActions}
+              renderRightActions={(progress, dragX) =>
+                renderRightActions(progress, dragX, item)
+              }
               overshootRight={false}
               friction={3}
             >
@@ -201,6 +253,7 @@ export default function AddProgramDetail() {
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Bir şeyler yazın..."
+            placeholderTextColor={isDarkMode ? "black" : "#888"}
             value={inputValue}
             onChangeText={handleInputChange}
             style={styles.input}
@@ -258,7 +311,7 @@ const getStyles = (isDarkMode: any) =>
       shadowRadius: 1,
       elevation: 2,
       borderRadius: 10,
-      backgroundColor: "white",
+      backgroundColor: isDarkMode ? "#7e7a81ff" : "white",
       marginBottom: 10,
       width: "100%",
     },

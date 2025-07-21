@@ -15,9 +15,10 @@ import {
   View,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
+import uuid from "react-native-uuid";
+import { ThemeContext } from "../ThemContext.js";
 import { clearHareketler } from "../data/hareketStorage";
 import { clearPrograms } from "../data/programStorage";
-import { ThemeContext } from "../ThemContext.js";
 const STORAGE_KEY = "program_data";
 
 export default function ProgramlarScreen() {
@@ -41,7 +42,7 @@ export default function ProgramlarScreen() {
     }
   };
 
-  // // ! BÜTÜN KAYITLARI SİL
+  // ! BÜTÜN KAYITLARI SİL
   // useEffect(() => {
   //   clearAllData();
   //   clearHareketler();
@@ -73,7 +74,7 @@ export default function ProgramlarScreen() {
   // Modal onay fonksiyonu (isim modalı)
   const handleAddProgram = () => {
     if (nameInput.trim() === "") {
-      Alert.alert("Uyarı", "Lütfen bir program ismi giriniz.");
+      Alert.alert("Uyarı");
       return;
     }
 
@@ -85,7 +86,7 @@ export default function ProgramlarScreen() {
 
     // Yeni program objesi
     const newProgram = {
-      id: Date.now().toString(),
+      id: uuid.v4(),
       name: nameInput.trim(),
       createdate: formatDate,
       usedate: formatDate,
@@ -123,11 +124,12 @@ export default function ProgramlarScreen() {
     });
 
     return (
-      <View style={{ width: 100, height: "100%" }}>
+      <View style={{ width: 100, height: "100%", marginLeft: 10 }}>
         <Animated.View
           style={{
-            flex: 1,
+            // flex: 1,
             transform: [{ translateX }],
+            justifyContent: "space-between",
           }}
         >
           <Pressable
@@ -137,11 +139,25 @@ export default function ProgramlarScreen() {
               justifyContent: "center",
               alignItems: "center",
               width: "100%",
-              height: 100,
+              height: "45%",
               borderRadius: 10,
             }}
           >
             <Text style={{ color: "white", fontWeight: "bold" }}>Sil</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => handleEdit(id)}
+            style={{
+              backgroundColor: "orange",
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: "45%",
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold" }}>Düzenle</Text>
           </Pressable>
         </Animated.View>
       </View>
@@ -167,6 +183,9 @@ export default function ProgramlarScreen() {
     );
   };
 
+  const handleEdit = (id: string) => {
+    router.push(`/addProgram?newprogram_id=${id}`);
+  };
   const handleAddConfirm = () => {
     console.log("Girilen ağırlık:", weight);
     console.log("Girilen tekrar:", repeat);
@@ -356,7 +375,7 @@ const getStyles = (isDarkMode: any) =>
       borderStyle: "solid",
       borderWidth: 2,
       // borderColor: "rgb(255, 198, 41)",
-      borderColor: isDarkMode ? "#33cccc" : "white",
+      borderColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
       justifyContent: "center",
       alignItems: "center",
     },
