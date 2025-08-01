@@ -38,16 +38,16 @@ export default function HomeScreen() {
         </View>
         <View style={(styles.shadowWrapper, styles.pressable)}>
           <Pressable
-            onPress={() => router.push("/not")}
+            onPress={() => router.push("/body/body")}
             // style={styles.pressable}
           >
             <View style={styles.box}>
               <Image
-                source={require("../../assets/gif/home/coming-soon-transparent.gif")}
+                source={require("../../assets/gif/home/measure.gif")}
                 style={styles.gif}
                 // contentFit="contain"
               />
-              <Text style={styles.font}>Yakında</Text>
+              <Text style={styles.font}>Vücut Ölçüleri</Text>
             </View>
           </Pressable>
         </View>

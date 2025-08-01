@@ -64,6 +64,14 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Stack.Screen
+        name="body/body"
+        options={{
+          title: "Vücut Ölçüleri", // otomatik ortalar
+        }}
+      />
+
       <Stack.Screen
         name="addProgram"
         options={{

@@ -1,7 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useNavigation, useRouter } from "expo-router";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   Animated,
@@ -29,8 +35,47 @@ export default function ProgramlarScreen() {
   const [weight, setWeight] = useState("");
   const [repeat, setRepeat] = useState("");
   const [nameInput, setNameInput] = useState("");
+  const [programID, setProgramID] = useState("");
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [programs, setPrograms] = useState<any[]>([]);
+  const swipeableRefs = useRef<(Swipeable | null)[]>([]);
+
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => setNameModalVisible(true)}
+          style={{
+            borderRadius: "50%", // daha net daire için
+            width: 40,
+            height: 40, // aspectRatio yerine sabit height kullan
+            marginRight: 15,
+            backgroundColor: isDarkMode ? "#33cccc" : "whitesmoke",
+            borderStyle: "dashed",
+            borderWidth: 2,
+            borderColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 28, // boyutu düşürdük çünkü 40 biraz taşırabilir
+              color: isDarkMode ? "white" : "#33cccc",
+              fontWeight: "300", // string olarak yazılmalı
+              textAlign: "center",
+              includeFontPadding: false, // Android için
+              textAlignVertical: "center", // Android için
+            }}
+          >
+            +
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
 
   const clearAllData = async () => {
     try {
@@ -61,7 +106,11 @@ export default function ProgramlarScreen() {
     };
     loadPrograms();
   }, []);
-
+  const closeAllSwip = () => {
+    Object.values(swipeableRefs.current).forEach((ref) => {
+      ref?.close();
+    });
+  };
   // AsyncStorage'a kaydetme fonksiyonu
   const savePrograms = async (data: any[]) => {
     try {
@@ -75,6 +124,27 @@ export default function ProgramlarScreen() {
   const handleAddProgram = () => {
     if (nameInput.trim() === "") {
       Alert.alert("Uyarı");
+      return;
+    }
+
+    if (programID) {
+      // Düzenleme işlemi
+      const updatedPrograms = programs.map((program) => {
+        if (program.id === programID) {
+          return {
+            ...program,
+            name: nameInput.trim(),
+          };
+        }
+        return program;
+      });
+
+      setPrograms(updatedPrograms);
+      savePrograms(updatedPrograms);
+      setProgramID("");
+      setNameInput("");
+      setNameModalVisible(false);
+      closeAllSwip();
       return;
     }
 
@@ -108,6 +178,7 @@ export default function ProgramlarScreen() {
     setNameInput("");
     setNameModalVisible(false);
 
+    closeAllSwip();
     // İstersen ekranda yeni program detay sayfasına da yönlendirebilirsin
     router.push(`/addProgram?newprogram_id=${newProgram.id}`);
   };
@@ -147,7 +218,10 @@ export default function ProgramlarScreen() {
           </Pressable>
 
           <Pressable
-            onPress={() => handleEdit(id)}
+            onPress={() => {
+              closeAllSwip();
+              handleEdit(id);
+            }}
             style={{
               backgroundColor: "orange",
               justifyContent: "center",
@@ -184,6 +258,7 @@ export default function ProgramlarScreen() {
   };
 
   const handleEdit = (id: string) => {
+    closeAllSwip();
     router.push(`/addProgram?newprogram_id=${id}`);
   };
   const handleAddConfirm = () => {
@@ -199,6 +274,9 @@ export default function ProgramlarScreen() {
       <ScrollView>
         {programs.map((program) => (
           <Swipeable
+            ref={(ref) => {
+              swipeableRefs.current[program.id] = ref;
+            }}
             key={program.id}
             renderRightActions={(progress, dragX) =>
               renderRightActions(progress, dragX, program.id)
@@ -208,9 +286,10 @@ export default function ProgramlarScreen() {
           >
             <View style={styles.shadowWrapper}>
               <Pressable
-                onPress={() =>
-                  router.push(`/program-detail?program_id=${program.id}`)
-                }
+                onPress={() => {
+                  closeAllSwip();
+                  router.push(`/program-detail?program_id=${program.id}`);
+                }}
               >
                 <View style={styles.container}>
                   <View style={styles.ImgContainer}>
@@ -240,6 +319,19 @@ export default function ProgramlarScreen() {
                       </Text>
                     </Text>
                   </View>
+                  <Pressable
+                    style={styles.ImgEditContainer}
+                    onPress={() => {
+                      setNameInput(program.name);
+                      setProgramID(program.id);
+                      setNameModalVisible(true);
+                    }}
+                  >
+                    <Image
+                      source={require("../../assets/gif/programs/edit.gif")}
+                      style={styles.editgif}
+                    />
+                  </Pressable>
                 </View>
               </Pressable>
             </View>
@@ -247,29 +339,56 @@ export default function ProgramlarScreen() {
         ))}
       </ScrollView>
 
-      <Pressable onPress={() => setNameModalVisible(true)} style={styles.add}>
-        <Modal visible={nameModalVisible} transparent animationType="fade">
-          <View style={styles.overlay}>
-            <View style={styles.modal}>
-              <Text>Program İsmi Giriniz:</Text>
+      {/* <Pressable onPress={() => setNameModalVisible(true)} style={styles.add}> */}
+      <Modal visible={nameModalVisible} transparent animationType="fade">
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <View style={styles.modalInputContainer}>
+              <Text style={styles.modalInputText}>Program İsmi Giriniz:</Text>
               <TextInput
                 style={styles.input}
                 value={nameInput}
                 onChangeText={setNameInput}
                 placeholder="Program Adı"
+                placeholderTextColor={isDarkMode ? "#eee" : "#222"}
               />
-              <View style={styles.buttonContainer}>
+            </View>
+            <View style={styles.buttonContainer}>
+              <Pressable
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => {
+                  setNameInput("");
+                  setNameModalVisible(false);
+                }}
+              >
+                <Text style={styles.buttonText}>Vazgeç</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.confirmButton]}
+                onPress={handleAddProgram}
+              >
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: isDarkMode ? "white" : "black" },
+                  ]}
+                >
+                  Onayla
+                </Text>
+              </Pressable>
+            </View>
+            {/* <View style={styles.buttonContainer}>
                 <Button
                   title="Vazgeç"
                   onPress={() => setNameModalVisible(false)}
                 />
                 <Button title="Onayla" onPress={handleAddProgram} />
-              </View>
-            </View>
+              </View> */}
           </View>
-        </Modal>
-        <Text style={styles.addPlus}>+</Text>
-      </Pressable>
+        </View>
+      </Modal>
+      {/* <Text style={styles.addPlus}>+</Text> */}
+      {/* </Pressable> */}
       {/* <View>
         <Text>{JSON.stringify(programs, null, 2)}</Text>
       </View> */}
@@ -315,6 +434,7 @@ const getStyles = (isDarkMode: any) =>
       gap: 10,
     },
     shadowWrapper: {
+      // position: "relative",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
@@ -359,17 +479,36 @@ const getStyles = (isDarkMode: any) =>
     createDate: {
       fontSize: 14,
     },
-    createDateText: {},
+    createDateText: {
+      width: "30%",
+      // aspectRatio: 1,
+      height: "100%",
+    },
     gif: {
       width: "75%",
       aspectRatio: 1,
     },
+    ImgEditContainer: {
+      width: "10%",
+      position: "absolute",
+      top: 10,
+      right: 0,
+      height: "100%",
+    },
+    editgif: {
+      // position: "absolute",
+      // top: 20,
+      // right: 20,
+      width: "90%",
+      aspectRatio: 1,
+      // zIndex: 99,
+    },
     add: {
-      width: 70,
+      width: 40,
       aspectRatio: 1,
       borderRadius: "50%",
       position: "absolute",
-      bottom: "5%",
+      top: 0,
       right: "5%",
       backgroundColor: isDarkMode ? "#33cccc" : "white",
       borderStyle: "solid",
@@ -380,31 +519,84 @@ const getStyles = (isDarkMode: any) =>
       alignItems: "center",
     },
     addPlus: {
-      lineHeight: 50,
-      fontSize: 50,
+      lineHeight: 40,
+      fontSize: 40,
       color: isDarkMode ? "white" : "#33cccc",
       fontWeight: 300,
     },
     overlay: {
       flex: 1,
-      backgroundColor: "#00000099",
+      backgroundColor: "rgba(0,0,0,0.6)", // Daha koyu ve opak
       justifyContent: "center",
       alignItems: "center",
+      paddingHorizontal: 20,
     },
     modal: {
-      width: 300,
-      padding: 20,
-      backgroundColor: "white",
-      borderRadius: 10,
+      width: "100%",
+      maxWidth: 360,
+      backgroundColor: isDarkMode ? "#2c2c2e" : "white",
+      borderRadius: 16,
+      paddingVertical: 25,
+      paddingHorizontal: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.25,
+      shadowRadius: 20,
+      elevation: 10,
+    },
+    modalContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 18,
+    },
+    modalInputContainer: {
+      //   flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      // justifyContent: "space-between",
+      // flexDirection: "row",
+      // alignItems: "center",
+      //   gap: 8,
+    },
+    modalInputText: {
+      color: isDarkMode ? "#eee" : "#222",
+      fontSize: 14,
+      marginBottom: 5,
     },
     input: {
-      borderBottomWidth: 1,
-      marginVertical: 10,
-      padding: 5,
+      width: "100%",
+      borderWidth: 1,
+      borderColor: isDarkMode ? "#555" : "#ccc",
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      fontSize: 16,
+      color: isDarkMode ? "#eee" : "#222",
+      backgroundColor: isDarkMode ? "#3a3a3c" : "#f9f9f9",
     },
     buttonContainer: {
       flexDirection: "row",
       justifyContent: "space-between",
-      marginTop: 10,
+      marginTop: 25,
+    },
+    button: {
+      flex: 1,
+      marginHorizontal: 5,
+      borderRadius: 10,
+      paddingVertical: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cancelButton: {
+      backgroundColor: isDarkMode ? "#444" : "#ddd",
+    },
+    confirmButton: {
+      backgroundColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
+    },
+    buttonText: {
+      fontWeight: "600",
+      fontSize: 16,
+      color: isDarkMode ? "white" : "black",
     },
   });

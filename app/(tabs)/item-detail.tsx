@@ -4,7 +4,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import {
   Alert,
   Animated,
-  Button,
   Modal,
   Pressable,
   ScrollView,
@@ -21,6 +20,8 @@ export default function ItemDetail() {
   const styles = getStyles(isDarkMode);
   const { hareket_id } = useLocalSearchParams<{ hareket_id: string }>();
   const [records, setRecords] = useState<any[]>([]);
+  const [hareketname, setHareketname] = useState<string | null>(null);
+
   const [expandedDates, setExpandedDates] = useState<Record<string, boolean>>(
     {}
   );
@@ -35,7 +36,10 @@ export default function ItemDetail() {
     const loadData = async () => {
       const hareketler = await loadHareketler();
       const found = hareketler.find((h: any) => h.id === hareket_id);
-      if (found) setRecords(found.records || []);
+      if (found) {
+        setRecords(found.records || []);
+        setHareketname(found.name || null); // 💡 burada name'ı al
+      }
     };
     loadData();
   }, [hareket_id]);
@@ -147,6 +151,9 @@ export default function ItemDetail() {
 
   return (
     <View style={styles.content}>
+      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.hareketName}>
+        {hareketname}
+      </Text>
       <ScrollView ref={scrollViewRef}>
         {Object.keys(groupedRecords).map((date) => (
           <View key={date}>
@@ -265,29 +272,61 @@ export default function ItemDetail() {
       <Modal visible={editModalVisible} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={styles.modal}>
-            <Text>Ağırlık (Kg):</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="phone-pad"
-              value={weight}
-              onChangeText={(text) =>
-                setWeight(text.replace(/[^0-9\.\-]/g, ""))
-              }
-            />
-            <Text>Tekrar (Adet):</Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="phone-pad"
-              value={repeat}
-              onChangeText={(text) => setRepeat(text.replace(/[^0-9\-]/g, ""))}
-            />
+            <View style={styles.modalContainer}>
+              <View style={styles.modalInputContainer}>
+                <Text style={styles.modalInputText}>Ağırlık (Kg):</Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="phone-pad"
+                  value={weight}
+                  onChangeText={(text) =>
+                    setWeight(text.replace(/[^0-9\.\-]/g, ""))
+                  }
+                />
+              </View>
+            </View>
+
+            <View style={styles.modalInputContainer}>
+              <Text>Tekrar (Adet):</Text>
+              <TextInput
+                style={styles.input}
+                keyboardType="phone-pad"
+                value={repeat}
+                onChangeText={(text) =>
+                  setRepeat(text.replace(/[^0-9\-]/g, ""))
+                }
+              />
+            </View>
+
             <View style={styles.buttonContainer}>
+              <Pressable
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => setEditModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Vazgeç</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.confirmButton]}
+                onPress={handleEditConfirm}
+              >
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { color: isDarkMode ? "white" : "black" },
+                  ]}
+                >
+                  Onayla
+                </Text>
+              </Pressable>
+            </View>
+
+            {/* <View style={styles.buttonContainer}>
               <Button
                 title="Vazgeç"
                 onPress={() => setEditModalVisible(false)}
               />
               <Button title="Onayla" onPress={handleEditConfirm} />
-            </View>
+            </View> */}
           </View>
         </View>
       </Modal>
@@ -372,24 +411,79 @@ const getStyles = (isDarkMode: any) =>
     },
     overlay: {
       flex: 1,
-      backgroundColor: "#00000099",
+      backgroundColor: "rgba(0,0,0,0.6)", // Daha koyu ve opak
       justifyContent: "center",
       alignItems: "center",
+      paddingHorizontal: 20,
     },
     modal: {
-      width: 300,
-      padding: 20,
-      backgroundColor: "white",
-      borderRadius: 10,
+      width: "100%",
+      maxWidth: 360,
+      backgroundColor: isDarkMode ? "#2c2c2e" : "white",
+      borderRadius: 16,
+      paddingVertical: 25,
+      paddingHorizontal: 20,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.25,
+      shadowRadius: 20,
+      elevation: 10,
     },
-    input: { borderBottomWidth: 1, marginVertical: 10, padding: 5 },
+    modalContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 18,
+    },
+    modalInputContainer: {
+      //   flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+      // justifyContent: "space-between",
+      // flexDirection: "row",
+      // alignItems: "center",
+      //   gap: 8,
+    },
+    modalInputText: {
+      color: isDarkMode ? "#eee" : "#222",
+      fontSize: 14,
+      marginBottom: 5,
+    },
+    input: {
+      width: "100%",
+      borderWidth: 1,
+      borderColor: isDarkMode ? "#555" : "#ccc",
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      fontSize: 16,
+      color: isDarkMode ? "#eee" : "#222",
+      backgroundColor: isDarkMode ? "#3a3a3c" : "#f9f9f9",
+    },
     buttonContainer: {
       flexDirection: "row",
-      justifyContent: "space-around",
-      // height: "100%",
-      marginTop: 10,
+      justifyContent: "space-between",
+      marginTop: 25,
     },
-
+    button: {
+      flex: 1,
+      marginHorizontal: 5,
+      borderRadius: 10,
+      paddingVertical: 12,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    cancelButton: {
+      backgroundColor: isDarkMode ? "#444" : "#ddd",
+    },
+    confirmButton: {
+      backgroundColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
+    },
+    buttonText: {
+      fontWeight: "600",
+      fontSize: 16,
+      color: isDarkMode ? "white" : "black",
+    },
     deleteBtn: {
       backgroundColor: "red",
       justifyContent: "center",
@@ -403,5 +497,9 @@ const getStyles = (isDarkMode: any) =>
       alignItems: "center",
       height: "45%",
       borderRadius: 10,
+    },
+    hareketName: {
+      color: "#33cccc",
+      fontSize: 18,
     },
   });
