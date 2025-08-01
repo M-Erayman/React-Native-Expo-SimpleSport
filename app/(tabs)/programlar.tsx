@@ -49,10 +49,10 @@ export default function ProgramlarScreen() {
           onPress={() => setNameModalVisible(true)}
           style={{
             borderRadius: "50%", // daha net daire için
-            width: 40,
-            height: 40, // aspectRatio yerine sabit height kullan
-            marginRight: 15,
-            backgroundColor: isDarkMode ? "#33cccc" : "whitesmoke",
+            width: 30,
+            height: 30, // aspectRatio yerine sabit height kullan
+            // marginRight: 5,
+            backgroundColor: isDarkMode ? "#2e2e2e" : "whitesmoke",
             borderStyle: "dashed",
             borderWidth: 2,
             borderColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
@@ -62,9 +62,9 @@ export default function ProgramlarScreen() {
         >
           <Text
             style={{
-              fontSize: 28, // boyutu düşürdük çünkü 40 biraz taşırabilir
-              color: isDarkMode ? "white" : "#33cccc",
-              fontWeight: "300", // string olarak yazılmalı
+              fontSize: 20, // boyutu düşürdük çünkü 40 biraz taşırabilir
+              color: isDarkMode ? "#33cccc" : "#33cccc",
+              fontWeight: 400, // string olarak yazılmalı
               textAlign: "center",
               includeFontPadding: false, // Android için
               textAlignVertical: "center", // Android için
@@ -75,7 +75,7 @@ export default function ProgramlarScreen() {
         </Pressable>
       ),
     });
-  }, [navigation]);
+  }, [navigation, isDarkMode]);
 
   const clearAllData = async () => {
     try {

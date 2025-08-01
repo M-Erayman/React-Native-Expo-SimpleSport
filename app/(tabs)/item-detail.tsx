@@ -1,6 +1,12 @@
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Alert,
   Animated,
@@ -31,6 +37,41 @@ export default function ItemDetail() {
   const [editRecordIndex, setEditRecordIndex] = useState<number | null>(null);
   const swipeableRefs = useRef<(Swipeable | null)[]>([]);
   const scrollViewRef = useRef<ScrollView>(null);
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => setEditModalVisible(true)}
+          style={{
+            borderRadius: "50%", // daha net daire için
+            width: 30,
+            height: 30, // aspectRatio yerine sabit height kullan
+            // marginRight: 5,
+            backgroundColor: isDarkMode ? "#2e2e2e" : "whitesmoke",
+            borderStyle: "dashed",
+            borderWidth: 2,
+            borderColor: isDarkMode ? "#33cccc" : "rgb(255, 198, 41)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 20, // boyutu düşürdük çünkü 40 biraz taşırabilir
+              color: isDarkMode ? "#33cccc" : "#33cccc",
+              fontWeight: 400, // string olarak yazılmalı
+              textAlign: "center",
+              includeFontPadding: false, // Android için
+              textAlignVertical: "center", // Android için
+            }}
+          >
+            +
+          </Text>
+        </Pressable>
+      ),
+    });
+  }, [navigation, isDarkMode]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -151,9 +192,23 @@ export default function ItemDetail() {
 
   return (
     <View style={styles.content}>
-      <Text numberOfLines={1} ellipsizeMode="tail" style={styles.hareketName}>
+      <Text numberOfLines={2} ellipsizeMode="tail" style={styles.hareketName}>
         {hareketname}
       </Text>
+      {records.length === 0 && (
+        <View style={styles.ImgContainer}>
+          <Image
+            source={require("../../assets/gif/item_detail/go_work.gif")}
+            style={[styles.gif, { width: "50%" }]}
+          />
+          <Text style={{ fontSize: 18, color: "#33cccc", fontWeight: "bold" }}>
+            Henüz kayıt eklenmedi.
+          </Text>
+          <Text style={{ fontSize: 18, color: "#33cccc", fontWeight: "bold" }}>
+            Haydi, çalışmaya başla!
+          </Text>
+        </View>
+      )}
       <ScrollView ref={scrollViewRef}>
         {Object.keys(groupedRecords).map((date) => (
           <View key={date}>
@@ -265,9 +320,9 @@ export default function ItemDetail() {
         ))}
       </ScrollView>
 
-      <Pressable onPress={() => setEditModalVisible(true)} style={styles.add}>
+      {/* <Pressable onPress={() => setEditModalVisible(true)} style={styles.add}>
         <Text style={styles.addPlus}>+</Text>
-      </Pressable>
+      </Pressable> */}
 
       <Modal visible={editModalVisible} transparent animationType="fade">
         <View style={styles.overlay}>
@@ -287,7 +342,7 @@ export default function ItemDetail() {
             </View>
 
             <View style={styles.modalInputContainer}>
-              <Text>Tekrar (Adet):</Text>
+              <Text style={styles.modalInputText}>Tekrar (Adet):</Text>
               <TextInput
                 style={styles.input}
                 keyboardType="phone-pad"
@@ -499,6 +554,7 @@ const getStyles = (isDarkMode: any) =>
       borderRadius: 10,
     },
     hareketName: {
+      textAlign: "center",
       color: "#33cccc",
       fontSize: 18,
     },
