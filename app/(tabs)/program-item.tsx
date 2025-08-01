@@ -1,6 +1,7 @@
+import { useFocusEffect } from "@react-navigation/native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { loadHareketler } from "../data/hareketStorage";
 import { loadPrograms } from "../data/programStorage";
@@ -42,15 +43,18 @@ export default function Programitem() {
     (vp) => vp.toLowerCase() === partParamLower
   ) as ValidPart | undefined;
 
-  useEffect(() => {
-    const loadData = async () => {
-      const hareketler = await loadHareketler();
-      const programlar = await loadPrograms();
-      setHareketData(hareketler || []);
-      setProgramData(programlar || []);
-    };
-    loadData();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        const hareketler = await loadHareketler();
+        const programlar = await loadPrograms();
+        setHareketData(hareketler || []);
+        setProgramData(programlar || []);
+      };
+
+      loadData();
+    }, [])
+  );
 
   if (!programData.length || !hareketData.length || !partKey) {
     return (
